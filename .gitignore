@@ -1,0 +1,234 @@
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+_deps/
+build/
+out/
+cmake-build-*/
+
+# C++ Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.ko
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Optional based on the way the packages are added to thirdparty folder and how they're used
+#*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Visual Studio
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.VC.opendb
+x64/
+x86/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.opensdf
+*.sdf
+*.cachefile
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.idb
+*.pdb
+*.ilk
+*.meta
+*.tlog/
+*.log
+*.iobj
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+ipch/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Zed Editor
+.zed/
+.zed-settings.json
+
+# JetBrains IDEs (CLion, etc.)
+.idea/
+cmake-build-*/
+*.iml
+*.iws
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# DirectX Shader Compiler outputs
+*.cso
+*.fxc
+*.pso
+shaders/compiled/
+*.dxc
+
+# HLSL compiled shaders
+*.hlsl.cso
+*.hlsl.obj
+
+# DirectX Debug Layer outputs
+*.dxgi
+
+# PIX captures and profiling data
+*.wpix
+*.pix3
+*.pixevt
+
+# RenderDoc captures
+*.rdc
+captures/
+
+# Graphics debugging files
+*.dgsl.hlsl
+
+# Shader reflection data
+*.sdb
+
+# Dependencies (if using package managers)
+vcpkg_installed/
+conan/
+_conan/
+.conan/
+
+# Build artifacts
+*.dSYM/
+*.su
+*.idb
+*.pdb
+compile_commands.json
+
+# Testing
+Testing/
+CTestTestfile.cmake
+DartConfiguration.tcl
+
+# Package files
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.7z
+
+# Backup files
+*.bak
+*.swp
+*.swo
+*~
+
+# Documentation generated files
+docs/html/
+docs/latex/
+Doxyfile.bak
+
+# Third-party libraries (adjust based on setup)
+#external/
+#third_party/
+#vendor/
+#libs/
+third_party/*/build/
+third_party/*/cmake-build-*/
+
+# Cache directories
+.cache/
+.ccls-cache/
+
+# Asset compilation outputs
+assets/compiled/
+resources/compiled/
+textures/compiled/
+
+# DXC (DirectX Shader Compiler) intermediate files
+*.dxil
+*.ll
+
+# DirectX Mesh Compiler outputs
+*.sdkmesh
+*.vbo
+
+# DirectX Texture Tool outputs
+*.dds.meta
+
+# GPU crash dumps
+*.dmp
+GPUCrashDumps/
+
+# DirectX Control Panel settings
+dxdiag.txt
