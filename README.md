@@ -23,4 +23,5 @@ This just helps clangd know where all your files and folders are.
 
 ### Copy commands file (if you're using Visual Studio you can skip this)
 inside your build folder you should see a file named "compile_commands.json"
-run this command to copy it to project root ``` copy compile_commands.json .. ```
+run this command to copy it to project root, or you can just copy and paste it
+``` copy compile_commands.json .. ```
