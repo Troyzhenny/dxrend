@@ -1,6 +1,40 @@
+#define WIN32_MEAN_AND_LEAN
 #include<windows.h>
+#include <shellapi.h> // For commandLineToArgvW
 #include <wingdi.h>
-// #include <iostream>
+
+// min / max macros conflict with like-named member functions
+// so stick to std::min / std::max defined in <algorithm>
+#if defined(min)
+#undef min
+#endif
+
+#if defined(max)
+#undef max
+#endif
+
+// to create a functin named CreateWindow the windows macro needs to
+// be undefined
+#if defined(CreateWindow)
+#undef CreateWindow
+#endif
+
+// windows runtime lib used for Microsoft::WRL::ComPtr<> template class
+#include <wrl.h>
+using namespace Microsoft::WRL;
+
+
+// DX12 headers
+#include <d3d12.h>
+#include <dxgi1_6.h>
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
+
+// D3D12 extension lib
+#include <d3dx12.h>
+
+// STL headers
+
 // #include "terminal_colors.h"
 
 
