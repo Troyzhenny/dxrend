@@ -234,3 +234,6 @@ GPUCrashDumps/
 
 # DirectX Control Panel settings
 dxdiag.txt
+
+# Build scripts
+*.ps1
