@@ -2,7 +2,7 @@
 to start you need to ensure you have cmake installed and also Ninja (optional) to build the project.
 
 ### Quick note (for people using Zed)
-If you're using zed as well (this probably also pertain to vscode users, not sure)
+If you're using zed as well (this probably also pertain to vscode users, not sure, But Visual Studio IDE users can skip this step)
 you'll need to add this line in CMakeLists.txt
 This just helps clangd know where all your files and folders are.
 ```
@@ -21,6 +21,6 @@ cmake -B build-release -DCMAKE_BUILD_TYPE=release -G Ninja
 cmake --build build-release
 ```
 
-### Copy commands file (if you're using Visual Studio you can skip this)
+### Copy compile commands file
 inside your build folder you should see a file named "compile_commands.json"
 copy it to project root.
