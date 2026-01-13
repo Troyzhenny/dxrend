@@ -1,11 +1,12 @@
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 #include <tchar.h>
+#include <string>
 
 
 
 const int wWidth = 800;
-const int wHeight = 600;
+const int wHeight = 800;
 const TCHAR* WndClassName = TEXT("Window Blueprint");
 const TCHAR* WndTitle = TEXT("Dxrend");
 
@@ -28,7 +29,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     wc.lpszClassName = WndClassName;
     wc.hIcon = nullptr;
 
-    // RegisterClassEx(&wc);
 
     if(!RegisterClassEx(&wc))
     {
@@ -47,11 +47,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
-    MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0))
+    MSG msg = {};
+    bool running = true;
+    while (running)
     {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+       while(PeekMessage(&msg , NULL, 0, 0, PM_REMOVE))
+       {
+           if(msg.message == WM_QUIT)
+           {
+               running = false;
+           }
+
+           TranslateMessage(&msg);
+           DispatchMessage(&msg);
+       }
+
+       // game loop code
+
     }
 
     return  msg.wParam;
@@ -69,13 +81,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_PAINT:
             hdc = BeginPaint(hWnd, &ps);
 
-            TextOut(hdc, 5, 5, greeting, _tcslen(greeting));
+            TextOut(hdc, wWidth/2, wHeight/2, greeting, _tcslen(greeting));
 
             EndPaint(hWnd, &ps);
             break;
 
         case WM_DESTROY:
             PostQuitMessage(0);
+            break;
+
+        case WM_KEYDOWN: // WM_CHAR is for text inputWM_KEYDOWN is for key presses like WASD
+            if (wParam == 'C') // when C key is pressed the window title changes
+            {
+                SetWindowText(hWnd, "New Window Name");
+            }
             break;
         default:
             return DefWindowProc(hWnd,message, wParam, lParam);
