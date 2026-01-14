@@ -237,3 +237,7 @@ dxdiag.txt
 
 # Build scripts
 *.ps1
+
+# .md files, .txt files (notes, docs)
+dx11guide.md
+win32_window_overview.md
