@@ -31,6 +31,11 @@ ID3D11DeviceContext* g_deviceContext = nullptr;
 IDXGISwapChain* g_swapChain = nullptr;
 ID3D11RenderTargetView* g_renderTargetView = nullptr;
 
+ID3D11VertexShader* g_vertexShader = nullptr;
+ID3D11PixelShader* g_pixelShader = nullptr;
+ID3D11InputLayout* g_inputLayout = nullptr;
+ID3D11Buffer* g_vertexBuffer = nullptr;
+
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -102,7 +107,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // Create Swapchain + description
 bool InitD3D(HWND hWnd)
 {
-    DXGI_SWAP_CHAIN_DESC scd ={};
+    DXGI_SWAP_CHAIN_DESC scd = {};
     scd.BufferCount = 1;
     scd.BufferDesc.Width = 0;
     scd.BufferDesc.Height = 0;
@@ -134,6 +139,7 @@ bool InitD3D(HWND hWnd)
 
     if(FAILED(hr))
     {
+        OutputDebugStringA("Failed to create device and swap chain\n");
         return false;
     }
 
@@ -159,6 +165,145 @@ bool InitD3D(HWND hWnd)
 
     g_deviceContext->RSSetViewports(1, &viewport);
 
+
+    // Compile vertex shader
+    ID3DBlob* vsBlob = nullptr;
+    ID3DBlob* errorBlob = nullptr;
+
+    hr = D3DCompileFromFile(
+      L"shaders/VertexShader.hlsl",
+      nullptr, nullptr,
+      "main",
+      "vs_5_0",
+      0,0,
+      &vsBlob,
+      &errorBlob
+    );
+
+    if (FAILED(hr))
+    {
+        // if(errorBlob)
+        // {
+        //     OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+        //     errorBlob->Release();
+        // }
+        if(errorBlob)
+        {
+            MessageBoxA(NULL, (char*)errorBlob->GetBufferPointer(), "Shader Error", MB_OK);
+            errorBlob->Release();
+        }
+        else
+        {
+            MessageBoxA(NULL, "Failed to compile vertex shader - file not found?", "Error", MB_OK);
+        }
+
+        return false;
+    }
+
+    g_device->CreateVertexShader(
+        vsBlob->GetBufferPointer(),
+        vsBlob->GetBufferSize(),
+        nullptr,
+        &g_vertexShader
+    );
+
+    // Compile Pixel Shader
+    ID3DBlob* psBlob = nullptr;
+
+    hr = D3DCompileFromFile(
+        L"shaders/PixelShader.hlsl",
+        nullptr, nullptr,
+        "main",
+        "ps_5_0",
+        0,0,
+        &psBlob,
+        &errorBlob
+    );
+
+    if (FAILED(hr))
+    {
+        // if(errorBlob)
+        // {
+        //     OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+        //     errorBlob->Release();
+        // }
+        if(errorBlob)
+        {
+            MessageBoxA(NULL, (char*)errorBlob->GetBufferPointer(), "Shader Error", MB_OK);
+            errorBlob->Release();
+        }
+        else
+        {
+            MessageBoxA(NULL, "Failed to compile pixel shader - file not found?", "Error", MB_OK);
+        }
+        vsBlob->Release();
+        return false;
+    }
+
+    g_device->CreatePixelShader(
+        psBlob->GetBufferPointer(),
+        psBlob->GetBufferSize(),
+        nullptr,
+        &g_pixelShader
+    );
+
+    psBlob->Release();
+
+    // Create Input layout - describes how vertex data is structured
+    D3D11_INPUT_ELEMENT_DESC layout[] =
+    {
+      {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+      {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+    };
+
+    g_device->CreateInputLayout(
+        layout,
+        2,
+        vsBlob->GetBufferPointer(),
+        vsBlob->GetBufferSize(),
+        &g_inputLayout
+    );
+
+    vsBlob->Release();
+
+    // Create vertex buffer
+    struct Vertex
+    {
+      float x, y, z;
+      float r, g, b, a;
+    };
+
+    Vertex triangleVertices[] =
+    {
+        { 0.0f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f },   // Top (red)
+        { 0.45f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f },  // Right (green)
+        {-0.45f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f }   // Left (blue)
+    };
+
+    D3D11_BUFFER_DESC bd = {};
+    bd.ByteWidth = sizeof(triangleVertices);
+    bd.Usage = D3D11_USAGE_DEFAULT;
+    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    bd.CPUAccessFlags = 0;
+
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = triangleVertices;
+
+    g_device->CreateBuffer(&bd, &initData, &g_vertexBuffer);
+
+
+    // Bind everthing to the piepline
+    g_deviceContext->IASetInputLayout(g_inputLayout);
+
+    UINT stride = sizeof(Vertex);
+    UINT offset = 0;
+    g_deviceContext->IASetVertexBuffers(0, 1, &g_vertexBuffer, &stride, &offset);
+
+    g_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    g_deviceContext->VSSetShader(g_vertexShader, nullptr, 0);
+    g_deviceContext->PSSetShader(g_pixelShader, nullptr, 0);
+
     return true;
 }
 
@@ -167,6 +312,9 @@ void RenderFrame()
     // Clear color
     float clearColor[4] = {1.0f, 0.522f, 0.349f, 0.961f};
     g_deviceContext->ClearRenderTargetView(g_renderTargetView, clearColor);
+
+    // Draw 3 vertices
+    g_deviceContext->Draw(3, 0);
 
     // Swap front and back buffer
     g_swapChain->Present(0,0);
@@ -180,11 +328,17 @@ void CleanD3D()
         g_swapChain
         g_renderTargetView
     **/
-  // Release core objects in reverse order
+  //----------- Release core objects in reverse order-----------------
+  if (g_vertexBuffer) g_vertexBuffer->Release();
+  if (g_inputLayout) g_inputLayout->Release();
+  if (g_pixelShader) g_pixelShader->Release();
+  if (g_vertexShader) g_vertexShader->Release();
+
   if (g_renderTargetView) g_renderTargetView->Release();
   if (g_swapChain) g_swapChain->Release();
   if (g_deviceContext) g_deviceContext->Release();
   if (g_device) g_device->Release();
+  //-------------------------------------------------------------------
 };
 
 
