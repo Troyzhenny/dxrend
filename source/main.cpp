@@ -1,25 +1,36 @@
-#include <cstddef>
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tchar.h>
 #include <d3d11.h>
 #include <dxgi.h>
+#include <d3dcompiler.h>
 // #include <string>
 // #include "terminal_colors.h"
 
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"dxgi.lib")
+#pragma comment(lib, "d3dcompiler.lib")
 
 
 
-
-const int wWidth = 800;
-const int wHeight = 800;
+// Globals
+const int wWidth = 600;
+const int wHeight = 500;
 const TCHAR* WndClassName = TEXT("Window Blueprint");
 const TCHAR* WndTitle = TEXT("Dxrend");
 
-
+// Forward Declarations
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+bool InitD3D(HWND hWnd);
+void CleanD3D();
+void RenderFrame();
+
+// DX globals
+ID3D11Device* g_device = nullptr;
+ID3D11DeviceContext* g_deviceContext = nullptr;
+IDXGISwapChain* g_swapChain = nullptr;
+ID3D11RenderTargetView* g_renderTargetView = nullptr;
+
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -34,7 +45,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     wc.hInstance = hInstance;
     wc.hIcon = nullptr;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = CreateSolidBrush(RGB(33, 32, 66));
+    wc.hbrBackground = CreateSolidBrush(RGB(0, 168, 95));
     wc.lpszMenuName = nullptr;
     wc.lpszClassName = WndClassName;
     wc.hIcon = nullptr;
@@ -57,8 +68,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
-    // initialize d3d
-
+    // Initialize DX
+    if(!InitD3D(hWnd))
+    {
+        MessageBox(NULL, _T("DirectX Initialization failed!"), "Error", MB_ICONEXCLAMATION | MB_OK);
+        CleanD3D();
+        return 0;
+    }
 
 
     MSG msg = {};
@@ -73,11 +89,103 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+
+        RenderFrame();
     }
 
+    // Clean up
+    CleanD3D();
 
     return  msg.wParam;
 }
+
+// Create Swapchain + description
+bool InitD3D(HWND hWnd)
+{
+    DXGI_SWAP_CHAIN_DESC scd ={};
+    scd.BufferCount = 1;
+    scd.BufferDesc.Width = 0;
+    scd.BufferDesc.Height = 0;
+    scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    scd.BufferDesc.RefreshRate.Numerator = 60;
+    scd.BufferDesc.RefreshRate.Denominator = 1;
+    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    scd.OutputWindow = hWnd;
+    scd.SampleDesc.Count = 1;
+    scd.SampleDesc.Quality = 0;
+    scd.Windowed = TRUE;
+    scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+    // Device. Context, and Swap Chain
+    HRESULT hr = D3D11CreateDeviceAndSwapChain(
+        NULL,
+        D3D_DRIVER_TYPE_HARDWARE,
+        NULL,
+        0,
+        NULL,
+        0,
+        D3D11_SDK_VERSION,
+        &scd,
+        &g_swapChain,
+        &g_device,
+        NULL,
+        &g_deviceContext
+    );
+
+    if(FAILED(hr))
+    {
+        return false;
+    }
+
+    // Get back buffer
+    ID3D11Texture2D* backBuffer = nullptr;
+    g_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**) &backBuffer);
+
+    // Render target view creation
+    g_device->CreateRenderTargetView(backBuffer, NULL, &g_renderTargetView);
+    backBuffer->Release();
+
+    // Set render target
+    g_deviceContext->OMSetRenderTargets(1, &g_renderTargetView, NULL);
+
+    // Set viewport
+    D3D11_VIEWPORT viewport = {};
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = wWidth;
+    viewport.Height = wHeight;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    g_deviceContext->RSSetViewports(1, &viewport);
+
+    return true;
+}
+
+void RenderFrame()
+{
+    // Clear color
+    float clearColor[4] = {1.0f, 0.522f, 0.349f, 0.961f};
+    g_deviceContext->ClearRenderTargetView(g_renderTargetView, clearColor);
+
+    // Swap front and back buffer
+    g_swapChain->Present(0,0);
+};
+
+void CleanD3D()
+{
+    /** Original order from forward declarations
+        g_device
+        g_deviceContext
+        g_swapChain
+        g_renderTargetView
+    **/
+  // Release core objects in reverse order
+  if (g_renderTargetView) g_renderTargetView->Release();
+  if (g_swapChain) g_swapChain->Release();
+  if (g_deviceContext) g_deviceContext->Release();
+  if (g_device) g_device->Release();
+};
 
 
 // handle messages within the procedure function
@@ -105,6 +213,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 SetWindowText(hWnd, "New Window Name");
             }
             break;
+
         default:
             return DefWindowProc(hWnd,message, wParam, lParam);
             break;
