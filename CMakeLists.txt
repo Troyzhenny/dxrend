@@ -9,12 +9,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(dxrend WIN32
     source/main.cpp
+    source/Renderer.cpp
 )
 
 
 target_include_directories(dxrend PRIVATE
     include/
-    third_party/
 )
 
 target_link_libraries(dxrend PRIVATE
