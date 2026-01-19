@@ -1,5 +1,12 @@
-# This is a rendering engine i'm building to learn graphics programming
-to start with this project you need to ensure you have cmake installed and also Ninja (optional) to build the project.
+# This is a renderer i'm building to learn graphics programming
+
+### Tech stack
+- DirectX 11
+- Win32
+- Cmake
+- C++
+
+To get started building the project, ensure you have cmake installed and optionally Ninja.
 
 ### Quick note (for people using Zed)
 If you're using zed as well (this probably also pertain to vscode users, But Visual Studio IDE users can skip this step)
@@ -9,6 +16,7 @@ This just helps clangd know where all your files and folders are.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ```
 
+<br>
 
 ### Get Started (project root)
 ```
