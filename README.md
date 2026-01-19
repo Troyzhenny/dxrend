@@ -1,8 +1,8 @@
 # This is a rendering engine i'm building to learn graphics programming
-to start you need to ensure you have cmake installed and also Ninja (optional) to build the project.
+to start with this project you need to ensure you have cmake installed and also Ninja (optional) to build the project.
 
 ### Quick note (for people using Zed)
-If you're using zed as well (this probably also pertain to vscode users, not sure, But Visual Studio IDE users can skip this step)
+If you're using zed as well (this probably also pertain to vscode users, But Visual Studio IDE users can skip this step)
 you'll need to add this line in CMakeLists.txt
 This just helps clangd know where all your files and folders are.
 ```
@@ -18,6 +18,17 @@ cmake --build build-debug
 
 # For Release
 cmake -B build-release -DCMAKE_BUILD_TYPE=release -G Ninja
+cmake --build build-release
+```
+
+### If you're not using ninja
+```
+# For Debug
+cmake -B build-debug -DCMAKE_BUILD_TYPE=Debug
+cmake --build build-debug
+
+# For Release
+cmake -B build-release -DCMAKE_BUILD_TYPE=release
 cmake --build build-release
 ```
 
